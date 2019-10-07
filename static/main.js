@@ -1,3 +1,5 @@
+'use strict';
+
 class Profile {
     constructor({
         username, 
