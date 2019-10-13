@@ -12,15 +12,15 @@ class Profile {
         this.password = password;
     }
 
-    createUser({username, name: {firstName, lastName}, password}, callback) {
-        return ApiConnector.createUser({username, name: {firstName, lastName}, password}, (err, data) => {
+    createUser(callback) {
+        return ApiConnector.createUser({username: this.username, name: this.name, password: this.password}, (err, data) => {
             console.log(`Creating user ${this.username}`);
             callback(err, data);
         })
     }
 
-    performLogin({username, password}, callback) {
-        return ApiConnector.performLogin({username, password}, (err, data) => {
+    performLogin(callback) {
+        return ApiConnector.performLogin({username: this.username, password: this.password}, (err, data) => {
             console.log(`Authorizing user ${this.username}`);
             callback(err, data);
         })
@@ -49,15 +49,21 @@ class Profile {
 }
 
 function getStocks(){
-    let exchangeRate = [];
     return ApiConnector.getStocks((err, data) => {
         console.log('Getting stocks info');
     }); 
 }
 
-getStocks();
 
 function main() {
+
+    getStocks((err, data) => {
+        if (err) {
+            console.error('Error during getting stocks');
+        } 
+        let exchangeRate = data[99];
+    });
+
     const Ivan = new Profile({
         username: 'ivan',
         name: { firstName: 'Ivan', lastName: 'Chernyshev' },
@@ -80,12 +86,16 @@ function main() {
                     console.error('Error during user authorization');
                 } else {
                     console.log('Ivan is authorized');
-                    Ivan.addMoney({ currency: 'EUR', amount: 500000 }, (err, data) => {
+                    let amount = 500000;
+                    Ivan.addMoney({ currency: 'EUR', amount: amount }, (err, data) => {
                         if (err) {
                                 console.error('Error during adding money to Ivan');
                         } else {
-                                console.log(`Added 500000 euros to Ivan`);
-                                Ivan.convertMoney({fromCurrency: 'EUR', targetCurrency:'NETCOIN', targetAmount: 500000}, (err, data) => {
+                                console.log(`Added ${amount} euros to Ivan`);
+                                // здесь должна быть конвертация из евро в неткоины
+                                // если вместо 50000 пишу amount далее появляется ошибка
+                                let targetAmount = 50000;// * exchangeRate['EUR_NETCOIN'];
+                                Ivan.convertMoney({fromCurrency: 'EUR', targetCurrency:'NETCOIN', targetAmount: targetAmount}, (err, data) => {
                                     if (err) {
                                         console.error('Error during converting');
                                     } else {
@@ -95,11 +105,11 @@ function main() {
                                                 console.error('Error during creating user Sasha');
                                             } else {
                                                 console.log('Sasha is created');
-                                                Ivan.transferMoney({to: Sasha, amount: 100}, (err, data) => {
+                                                Ivan.transferMoney({to: Sasha.username, amount: targetAmount}, (err, data) => {
                                                     if (err) {
                                                         console.error('Error during transfering')
                                                     } else {
-                                                        console.log('Sasha has got 36000 Netcoins');
+                                                        console.log(`Sasha has got ${targetAmount} Netcoins`);
                                                     }
                                                 })
                                             }
@@ -113,7 +123,8 @@ function main() {
             })
         }
 
-    });
+     });
+    
 }
 
 main();
