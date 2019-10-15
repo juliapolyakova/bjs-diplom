@@ -54,29 +54,27 @@ function getStocks(){
     }); 
 }
 
+let exchangeRate;
 
 function main() {
-
+    
     getStocks((err, data) => {
         if (err) {
             console.error('Error during getting stocks');
         } 
-        let exchangeRate = data[99];
-    });
-
-    const Ivan = new Profile({
-        username: 'ivan',
-        name: { firstName: 'Ivan', lastName: 'Chernyshev' },
-        password: 'ivanspass',
-    });
-
-    const Sasha = new Profile({
-        username: 'sasha',
-        name: { firstName: 'Sasha', lastName: 'Ivanov' },
-        password: 'summer',
-    });
-
-    Ivan.createUser( (err, data) => {
+        exchangeRate = data[0];
+        const Ivan = new Profile({
+            username: 'ivan',
+            name: { firstName: 'Ivan', lastName: 'Chernyshev' },
+            password: 'ivanspass',
+        });
+    
+        const Sasha = new Profile({
+            username: 'sasha',
+            name: { firstName: 'Sasha', lastName: 'Ivanov' },
+            password: 'summer',
+        });
+        Ivan.createUser( (err, data) => {
         if (err) {
             console.error('Error during creating user Ivan');
         } else {
@@ -94,7 +92,7 @@ function main() {
                                 console.log(`Added ${amount} euros to Ivan`);
                                 // здесь должна быть конвертация из евро в неткоины
                                 // если вместо 50000 пишу amount далее появляется ошибка
-                                let targetAmount = 50000;// * exchangeRate['EUR_NETCOIN'];
+                                let targetAmount = 50000 * exchangeRate['EUR_NETCOIN'];
                                 Ivan.convertMoney({fromCurrency: 'EUR', targetCurrency:'NETCOIN', targetAmount: targetAmount}, (err, data) => {
                                     if (err) {
                                         console.error('Error during converting');
@@ -124,7 +122,7 @@ function main() {
         }
 
      });
-    
+    });
 }
 
 main();
