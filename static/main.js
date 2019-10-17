@@ -51,6 +51,7 @@ class Profile {
 function getStocks(){
     return ApiConnector.getStocks((err, data) => {
         console.log('Getting stocks info');
+        callback(err, data);
     }); 
 }
 
@@ -58,12 +59,12 @@ let exchangeRate;
 
 function main() {
     
-    getStocks((err, data) => {
+    getStocks( (err, data) => {
         if (err) {
             console.error('Error during getting stocks');
-        } 
-        exchangeRate = data[0];
-        const Ivan = new Profile({
+        } else {
+          exchangeRate = data[0];
+          const Ivan = new Profile({
             username: 'ivan',
             name: { firstName: 'Ivan', lastName: 'Chernyshev' },
             password: 'ivanspass',
@@ -121,7 +122,8 @@ function main() {
             })
         }
 
-     });
+      });
+     }
     });
 }
 
